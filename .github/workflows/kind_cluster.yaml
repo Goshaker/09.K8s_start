@@ -18,8 +18,15 @@ jobs:
           sudo mv ./kind /usr/local/bin/kind
           kind create cluster
 
-      - name: Check Cluster Info
+      - name: Extract Cluster Info
         run: |
-          kubectl cluster-info
-          kubectl get nodes
-          kubectl version
+          kubectlversion=$(kubectl version)
+          kindversion=$(kind version)
+          pods=$(kubectl get pods -A)
+          nodes=$(kind get nodes --name kind)
+          echo "kubectl Version: $kubectlversion" > kind-cluster-info.txt
+          echo "KinD Version: $kindversion" >> kind-cluster-info.txt
+          echo "Pods: $pods" >> kind-cluster-info.txt
+          echo "Nodes: $nodes" >> kind-cluster-info.txt
+          echo "How long spin up (Time): $((${{steps.end_time_kind.outputs.end_kind}} - ${{steps.start_time_kind.outputs.start_kind}})) seconds"  >> kind-cluster-info.txt
+        shell: bash
